@@ -82,7 +82,7 @@ void Sub::failsafe_internal_pressure_check() {
 	uint32_t tnow = AP_HAL::millis();
 	static uint32_t last_pressure_warn_ms;
 	static uint32_t last_pressure_good_ms;
-	if(barometer.get_pressure(0) < g.failsafe_pressure_max) {
+	if(barometer.get_pressure(0) < g.failsafe_pressure_max && !ext_failsafe.internal_pressure) {
 		last_pressure_good_ms = tnow;
 		last_pressure_warn_ms = tnow;
 		failsafe.internal_pressure = false;
@@ -108,9 +108,11 @@ void Sub::failsafe_internal_temperature_check() {
 	}
 
 	uint32_t tnow = AP_HAL::millis();
-	static uint32_t last_temperature_warn_ms;
-	static uint32_t last_temperature_good_ms;
-	if(barometer.get_temperature(0) < g.failsafe_temperature_max) {
+	static uint32_t last_temperature_warn_ms = 0;
+	static uint32_t last_temperature_good_ms = 0;
+
+	// Onboard baro, internal pressure
+	if(barometer.get_temperature(0) < g.failsafe_temperature_max && !ext_failsafe.internal_temperature) {
 		last_temperature_good_ms = tnow;
 		last_temperature_warn_ms = tnow;
 		failsafe.internal_temperature = false;
