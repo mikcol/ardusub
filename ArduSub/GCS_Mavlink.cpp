@@ -2020,8 +2020,14 @@ void GCS_MAVLINK_Sub::handleMessage(mavlink_message_t* msg)
 
     	mavlink_sys_status_t packet;
     	mavlink_msg_sys_status_decode(msg, &packet);
-    	if((packet.onboard_control_sensors_enabled & MAV_SYS_STATUS_SENSOR_WATER) && !(packet.onboard_control_sensors_health & MAV_SYS_STATUS_SENSOR_WATER)) {
-    		sub.water_detector.set_detect();
+
+    	if(packet.onboard_control_sensors_enabled & MAV_SYS_STATUS_SENSOR_WATER) {
+    		if(packet.onboard_control_sensors_health & MAV_SYS_STATUS_SENSOR_WATER) {
+    			sub.ext_failsafe.leak = false;
+    		} else {
+    			sub.ext_failsafe.leak = true;
+    			sub.water_detector.set_detect();
+    		}
     	}
 
     	if((packet.onboard_control_sensors_enabled & MAV_SYS_STATUS_SENSOR_TEMPERATURE)) {
