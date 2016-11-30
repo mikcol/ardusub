@@ -107,6 +107,14 @@ void Sub::init_ardupilot()
     // load parameters from EEPROM
     load_parameters();
 
+    // Force BRD_TYPE parameter to 100 to force old PX4 drivers instead of in-tree drivers
+    // Some issues reported with BAR30 not coming up with in-tree drivers
+    enum ap_var_type var_type;
+    AP_Param *vp = AP_Param::find("BRD_TYPE", &var_type);
+	AP_Int8 t;
+	t = 100;
+	vp->set_float(t.cast_to_float(), var_type);
+
     BoardConfig.init();
 
     // initialise serial port
